@@ -37,6 +37,31 @@ name (`shipping-with-claude`, `nw-fuel-planner`, `caretier-tires`, `proofing-roo
 6. Only commit assets we have the rights to. Note AI-generated imagery where it matters.
 7. In posts, always set `alt` text plus `width` and `height` on the `<img>`.
 
+## Preparing images (`tools/prepare-image.py`)
+
+Runs rules 2 to 4 for you: dated lowercase filename, upright orientation, EXIF/GPS/ICC stripped
+(colors converted to sRGB first), resized to at most 1600 px wide, compressed toward 500 KB. It
+refuses to overwrite a published file and rejects an unknown venture name (typo guard). It prints
+the `<img>` snippet with `width` and `height`; you still write the `alt` text.
+
+One-time setup (Pillow lives in a local venv, nothing here is deployed):
+
+```
+python -m venv .venv
+.venv/Scripts/python -m pip install -r tools/requirements.txt
+```
+
+Use (from the repo root):
+
+```
+.venv/Scripts/python tools/prepare-image.py C:/path/photo.jpg --venture proofing-room --slug still-diagram
+.venv/Scripts/python tools/prepare-image.py logo.png --venture shared --slug logo --format png
+```
+
+Options: `--format webp|jpeg|png` (default webp, keeps transparency; jpeg flattens onto white),
+`--kind blog|avatars`, `--max-width`, `--date`, `--new-venture` (first asset for a new venture),
+`--dry-run`. Then commit and push as below.
+
 ## Publishing
 
 Commit and push to `main`. Vercel deploys automatically; the URL works within a minute.
